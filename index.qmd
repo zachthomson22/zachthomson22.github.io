@@ -1,12 +1,28 @@
 ---
-title: "zachthomson22.github.io"
+title: "Zach Thomson"
+image: Images/IMG_3100.jpeg
+toc: FALSE
+about: 
+  template: trestles
+  image-shape: round
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/zachwthomson/
+    - icon: github
+      text: GitHub
+      href: https://github.com/zachthomson22
+    - icon: envelope  
+      text: Email
+      href: thomsonzach268@gmail.com
 ---
 
-This is a Quarto website.
+Hi! I am senior at St. Olaf College majoring in biology with a concentration in business & management studies.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+## Education 
 
-```{r}
-1 + 1
-```
- 
+St. Olaf College |
+
+
+
+
