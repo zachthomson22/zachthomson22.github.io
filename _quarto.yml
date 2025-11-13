@@ -12,7 +12,7 @@ website:
 
 format:
   html:
-    theme: solar
+    theme: flatly
     css: styles.css
     toc: true
     page-layout: full
