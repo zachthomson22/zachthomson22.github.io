@@ -9,6 +9,7 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
+      - The_Guardian_Text_Analysis.qmd
 
 format:
   html:
