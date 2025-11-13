@@ -1,17 +1,80 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
+    "objectID": "The_Guardian_Text_Analysis.html",
+    "href": "The_Guardian_Text_Analysis.html",
+    "title": "The Guardian Text Analysis",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "The focus of this project is on the patterns in words and sentiment across Guardian publication years and sections. The dataset spans from 2016 - 2022, and includes 164 different article sections. Headlines are short, sharp strings of text designed to capture attention. Studying their structure and content offers insight into what issues dominated public conversation at different points in time, and how the tone of media shifted in response to political, social, and health events.\nThe goals of this analysis are:\n\nTo identify the most common words across headlines.\nTo examine how headline language changed by year.\nTo explore sentiment in headline wording and whether certain tones dominated certain years and article sections."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#introduction",
+    "href": "The_Guardian_Text_Analysis.html#introduction",
+    "title": "The Guardian Text Analysis",
+    "section": "",
+    "text": "The focus of this project is on the patterns in words and sentiment across Guardian publication years and sections. The dataset spans from 2016 - 2022, and includes 164 different article sections. Headlines are short, sharp strings of text designed to capture attention. Studying their structure and content offers insight into what issues dominated public conversation at different points in time, and how the tone of media shifted in response to political, social, and health events.\nThe goals of this analysis are:\n\nTo identify the most common words across headlines.\nTo examine how headline language changed by year.\nTo explore sentiment in headline wording and whether certain tones dominated certain years and article sections."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#background",
+    "href": "The_Guardian_Text_Analysis.html#background",
+    "title": "The Guardian Text Analysis",
+    "section": "Background",
+    "text": "Background\nThe Guardian is a UK-based news outlet with global readership. Between 2016–2022, its coverage included major world events: Brexit (2016), the Trump presidency (2016–2020), COVID-19 (2020 onward), and global economic and political challenges. By analyzing title wording, we can identify recurring themes and shifts in tone, as well as the ways in which different sections of the paper highlight particular issues. To examine these shifts, the dataset requires cleaning and restructuring to make headlines comparable across years and sections."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#preparing-the-data",
+    "href": "The_Guardian_Text_Analysis.html#preparing-the-data",
+    "title": "The Guardian Text Analysis",
+    "section": "Preparing the Data",
+    "text": "Preparing the Data\nBefore we can analyze text, we need to clean it. Headlines contain a mix of lowercase and uppercase words, punctuation, and numbers. For consistency, all titles were converted to lowercase, punctuation removed, and new columns created to capture year and headline length. There are over 160 different article sections in this dataset. For simplicity, analysis focuses on six major sections: Business, Culture, News, Opinion, Sport, and World news. The year 2022 was removed as the year was not complete was the dataset was created."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#word-frequencies",
+    "href": "The_Guardian_Text_Analysis.html#word-frequencies",
+    "title": "The Guardian Text Analysis",
+    "section": "Word Frequencies",
+    "text": "Word Frequencies\nA simple frequency count shows which words dominate. However, many of these are common stopwords like “the” or “and.” Removing stopwords reveals more meaningful terms.\n\n\n\n\n\nFrequency of the 20 most common non-stopwords in the Guardian dataset.\n\n\n\n\nThe top 20 non-stopwords plot highlights which words dominate headlines after common stopwords are removed. Words such as “Brexit,” “Trump,” and “COVID” align with major historical events, showing how headline language mirrors the public discourse of each year. For example, “Brexit” dominates in 2016–2017, “Trump” during 2016–2020, and “COVID” spikes in 2020. The prominence of these terms in News and World articles confirms that high-volume sections drive the most recurrent topics, while words in Opinion and Culture reflect evaluative or thematic content.\nBefore interpreting the prominence of words, it is useful to consider which sections contribute the most content, since high-volume sections naturally influence overall frequency patterns.\n\n\n\nNumber of Guardian Articles by Section (2016–2021)\n\n\nSection\nYear\nNumber of Articles\n\n\n\n\nBusiness\n2016\n1118\n\n\n2017\n891\n\n\n2018\n1008\n\n\n2019\n999\n\n\n2020\n1217\n\n\n2021\n1168\n\n\nCulture\n2016\n213\n\n\n2017\n204\n\n\n2018\n241\n\n\n2019\n251\n\n\n2020\n339\n\n\n2021\n365\n\n\nNews\n2016\n155\n\n\n2017\n201\n\n\n2018\n221\n\n\n2019\n238\n\n\n2020\n204\n\n\n2021\n204\n\n\nOpinion\n2016\n1766\n\n\n2017\n2069\n\n\n2018\n2077\n\n\n2019\n2018\n\n\n2020\n1806\n\n\n2021\n1621\n\n\nSport\n2016\n1706\n\n\n2017\n1661\n\n\n2018\n1597\n\n\n2019\n1579\n\n\n2020\n1404\n\n\n2021\n1720\n\n\nWorld news\n2016\n1831\n\n\n2017\n1729\n\n\n2018\n2034\n\n\n2019\n2050\n\n\n2020\n3619\n\n\n2021\n2789\n\n\n\n\n\n\n\nThis table summarizes the number of Guardian articles published in six key sections between 2016 and 2021, excluding the incomplete year 2022. It highlights trends in content production across sections and years, showing which sections consistently generate the most coverage reflecting the Guardian’s emphasis on reporting current events and international affairs. News and Culture sections have smaller, more variable output, suggesting more selective or theme-driven coverage. This distribution provides context for interpreting word frequency and sentiment: high-volume sections naturally contribute more to the dataset’s overall language patterns, while lower-volume sections introduce distinctive or evaluative terms."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#sentiment-in-headlines",
+    "href": "The_Guardian_Text_Analysis.html#sentiment-in-headlines",
+    "title": "The Guardian Text Analysis",
+    "section": "Sentiment in Headlines",
+    "text": "Sentiment in Headlines\nBeyond frequency, it is useful to examine the sentiment, or tone of headlines.\n\n\n\n\n\nThe ten most frequent words associated with positive and negative sentiment in the Guardian dataset.\n\n\n\n\nPositive sentiment words like best, win, like, and love contrast with negative words like crisis, death, and attack. The word ‘Trump’ was removed because sentiment cannot be objectively assigned to a proper noun. While overall tone shows contrasts between positive and negative framing, it is equally important to see how these patterns evolved in response to major events year by year."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#change-over-time",
+    "href": "The_Guardian_Text_Analysis.html#change-over-time",
+    "title": "The Guardian Text Analysis",
+    "section": "Change Over Time",
+    "text": "Change Over Time\n\n\n\n\n\nThe five most frequent non-stopwords in the Guardian dataset for each year, 2016–2022.\n\n\n\n\nThe plot highlights how headline vocabulary shifted with major global and political events. “Brexit” was dominant in 2016–2017, reflecting the referendum and its aftermath, while “Trump” featured consistently from 2016 through 2020. In 2020, “COVID” surged far beyond all other terms, peaking alongside terms such as ‘lockdown’ and ‘vaccine’ in 2020–2021, reflecting how the pandemic reshaped media attention. These shifts illustrate how headlines mirror public discourse, with dominant terms closely tied to the most pressing global issues of the time.\nIn addition to changes across years, sentiment also varies depending on the section in which a headline appears."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#sentiment-by-section",
+    "href": "The_Guardian_Text_Analysis.html#sentiment-by-section",
+    "title": "The Guardian Text Analysis",
+    "section": "Sentiment by Section",
+    "text": "Sentiment by Section\n\n\n\n\n\nAverage sentiment of words in Guardian articles by section.\n\n\n\n\nThe sentiment analysis by section highlights variation in tone across Guardian coverage. Sport and Culture are the only two sections with predominantly positive sentiment. In contrast, Opinion, News, Business, and World news carry increasingly negative sentiment, with World news being the most negative overall. This distribution suggests that sections emphasizing commentary, current events, and financial coverage rely on more critical or pessimistic language, while of Culture and Sports coverage tend to adopt more neutral or favorable wording.\n\n\n\n\n\nThe ten most frequent non-stopwords in each major Guardian section\n\n\n\n\nThe frequency analysis of top words by section further illustrates the thematic divides in coverage. Each section is defined by its own vocabulary, reflecting the issues and events that dominate that area of reporting. The prominence of certain recurring terms underscores how language choices shape tone and focus across sections. When considered alongside the sentiment analysis, the word frequency plot reinforces the idea that subject matter is closely tied to the tone conveyed, with structural differences in reporting leading to differences in sentiment.\nTogether, frequency, sentiment, and section analysis illustrate the interaction between content volume, language, and tone across Guardian coverage."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#conclusion",
+    "href": "The_Guardian_Text_Analysis.html#conclusion",
+    "title": "The Guardian Text Analysis",
+    "section": "Conclusion",
+    "text": "Conclusion\nThis project shows how text analysis can reveal both the dominant topics and the tone of media coverage. Across 2016–2021, headline language tracked major world events such as Brexit, the Trump presidency, and the COVID-19 pandemic, with shifts in word frequency aligning closely with the timing of these developments. By removing common words and focusing on more meaningful terms, the analysis highlighted how global crises and political figures shaped headline priorities, while output differences between sections revealed the Guardian’s emphasis on current events and international reporting.\nSentiment and section-level analysis added another layer of interpretation, showing that Sport and Culture coverage leaned more positive, while Opinion, News, Business, and World news sections carried a more negative tone. The top words in each section further reflected these divides, illustrating how language and sentiment interact with subject matter."
+  },
+  {
+    "objectID": "The_Guardian_Text_Analysis.html#sources",
+    "href": "The_Guardian_Text_Analysis.html#sources",
+    "title": "The Guardian Text Analysis",
+    "section": "Sources",
+    "text": "Sources\nGuardian Kaggle dataset\nThe Kable Package"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Zach Thomson",
     "section": "",
-    "text": "Hi! I am senior at St. Olaf College majoring in biology with a concentration in business & management studies.\nThis website"
+    "text": "Hi! I am senior at St. Olaf College majoring in biology with a concentration in business & management studies.\nThe primary goal of this website is to display the data science projects I have worked on over the last few years. The panel at the _______ and shares a little more about me. All of the code used to produce these projects, including this website, can be found on my GitHub linked below."
   },
   {
     "objectID": "index.html#education",

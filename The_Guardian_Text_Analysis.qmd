@@ -1,4 +1,265 @@
 ---
 title: "*The Guardian* Text Analysis"
-format: html
+format: 
+  html:
+    toc: TRUE
+    code-fold: TRUE
+    smooth-scroll: TRUE
 ---
+
+```{r}
+#| include: FALSE
+
+library(tidyverse)
+library(tidytext)
+library(textdata)
+library(wordcloud)
+library(wordcloud2)
+library(viridis)
+library(ggthemes)
+library(dplyr)
+library(knitr)
+library(forcats)
+library(kableExtra)
+library(wordcloud2)
+```
+
+```{r, include=FALSE, message=FALSE}
+guardian_data <- read.csv("~/Downloads/guardian_articles.csv")
+```
+
+## Introduction
+The focus of this project is on the patterns in words and sentiment across Guardian publication years and sections. The dataset spans from 2016 - 2022, and includes 164 different article sections. Headlines are short, sharp strings of text designed to capture attention. Studying their structure and content offers insight into what issues dominated public conversation at different points in time, and how the tone of media shifted in response to political, social, and health events.
+
+The goals of this analysis are:
+
+1. To identify the most common words across headlines.
+
+2. To examine how headline language changed by year.
+
+3. To explore sentiment in headline wording and whether certain tones dominated certain years and article sections.
+
+## Background
+The Guardian is a UK-based news outlet with global readership. Between 2016–2022, its coverage included major world events: Brexit (2016), the Trump presidency (2016–2020), COVID-19 (2020 onward), and global economic and political challenges. By analyzing title wording, we can identify recurring themes and shifts in tone, as well as the ways in which different sections of the paper highlight particular issues. To examine these shifts, the dataset requires cleaning and restructuring to make headlines comparable across years and sections.
+ 
+## Preparing the Data
+Before we can analyze text, we need to clean it. Headlines contain a mix of lowercase and uppercase words, punctuation, and numbers. For consistency, all titles were converted to lowercase, punctuation removed, and new columns created to capture year and headline length. There are over 160 different article sections in this dataset. For simplicity, analysis focuses on six major sections: Business, Culture, News, Opinion, Sport, and World news. The year 2022 was removed as the year was not complete was the dataset was created.
+```{r, echo=FALSE}
+#str functions that make three new columns: the titles all lowercase, extract just the year, counts characters in the article title, extracts the first word of the headline, and removes punctuation 
+guardian_tidy <- guardian_data |> 
+  select(webTitle, sectionName, webPublicationDate) |> 
+  mutate(webTitle = str_to_lower(webTitle),
+         pub_year = str_extract(webPublicationDate, "^\\d{4}"),
+         title_length = str_length(webTitle),
+         first_word = str_extract(webTitle, "^[a-z]+"),
+         webTitle = str_replace_all(webTitle, "[^a-z\\s]", ""))
+```
+
+```{r, include=FALSE, message=FALSE, echo=FALSE} 
+# confirms publication years and distinct section names
+guardian_tidy |> 
+  distinct(pub_year)
+
+guardian_tidy |> 
+  distinct(sectionName)
+```
+
+
+```{r, include=FALSE, message=FALSE, echo=FALSE}
+#filters out the year 2022 because it is incomplete and tokeenizes the dataset 
+guardian_words <- guardian_tidy |> 
+  filter(pub_year != 2022) |>
+  mutate(line = row_number()) |> 
+  unnest_tokens(word, webTitle, token = "words")
+```
+
+```{r, include=FALSE, message=FALSE, echo=FALSE}
+get_stopwords() |> print(n = 50) 
+get_stopwords(source = "smart") |> print(n = 50)   
+
+smart_stopwords <- get_stopwords(source = "smart")
+```
+
+## Word Frequencies  
+A simple frequency count shows which words dominate. However, many of these are common stopwords like “the” or “and.” Removing stopwords reveals more meaningful terms.
+
+```{r, include=FALSE, message=FALSE, echo=FALSE}
+# tibble of the top ten most common words
+guardian_words |>
+  count(word, sort = TRUE) |> 
+  head(10)
+```
+
+```{r, fig.width=10, fig.height=8, message=FALSE, warning=FALSE, echo=FALSE, fig.cap= "Frequency of the 20 most common non-stopwords in the Guardian dataset."}
+# uses antijoin to remove smart words and plot the top 20
+guardian_words |>
+  anti_join(smart_stopwords) |>
+  count(word, sort = TRUE) |>
+  filter(word != "NA") |>
+  slice_max(n, n = 20) |> 
+  ggplot(aes(fct_reorder(word, n), n)) +
+  geom_col(fill = "darkblue") +
+  coord_flip() +
+  labs(title = "Top 20 Non-Stopwords", 
+       x = "Word",
+       y = "Count") +
+  theme_bw()
+```
+The top 20 non-stopwords plot highlights which words dominate headlines after common stopwords are removed. Words such as “Brexit,” “Trump,” and “COVID” align with major historical events, showing how headline language mirrors the public discourse of each year. For example, “Brexit” dominates in 2016–2017, “Trump” during 2016–2020, and “COVID” spikes in 2020. The prominence of these terms in News and World articles confirms that high-volume sections drive the most recurrent topics, while words in Opinion and Culture reflect evaluative or thematic content.
+
+Before interpreting the prominence of words, it is useful to consider which sections contribute the most content, since high-volume sections naturally influence overall frequency patterns.
+
+```{r, fig.width=10, fig.height=8, message=FALSE, warning=FALSE, echo=FALSE}
+# first, creates a new dataset with just the major sections and counts by year. Then, uses Kable to create a table
+section_counts <- guardian_tidy |> 
+  filter(sectionName %in% c("News", "Opinion", "Sport", "Culture", "Business", "World news")) |> 
+  filter(pub_year >= 2016 & pub_year <= 2021) |> 
+  group_by(sectionName, pub_year) |> 
+  summarise(article_count = n(), .groups = "drop")
+
+section_counts |> 
+  filter(pub_year != 2022) |> 
+  kable(
+    caption = "Number of Guardian Articles by Section (2016–2021)",
+    col.names = c("Section", "Year", "Number of Articles"),
+    align = c("l", "c", "c")
+  ) |> 
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed")) |> 
+  column_spec(1, bold = TRUE) |>     # table formatting
+  column_spec(3, width = "6em") |> 
+  collapse_rows(columns = 1, valign = "top")
+```
+This table summarizes the number of Guardian articles published in six key sections between 2016 and 2021, excluding the incomplete year 2022. It highlights trends in content production across sections and years, showing which sections consistently generate the most coverage reflecting the Guardian’s emphasis on reporting current events and international affairs. News and Culture sections have smaller, more variable output, suggesting more selective or theme-driven coverage. This distribution provides context for interpreting word frequency and sentiment: high-volume sections naturally contribute more to the dataset’s overall language patterns, while lower-volume sections introduce distinctive or evaluative terms.
+
+## Sentiment in Headlines
+
+Beyond frequency, it is useful to examine the sentiment, or tone of headlines.
+
+```{r, include=FALSE, message=FALSE, echo=FALSE}
+get_sentiments(lexicon = "afinn")
+get_sentiments(lexicon = "nrc")
+get_sentiments(lexicon = "bing")
+
+bing_sentiments <- get_sentiments(lexicon = "bing")
+```
+
+```{r, fig.width=10, fig.height=8, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "The ten most frequent words associated with positive and negative sentiment in the Guardian dataset."}
+# innerjoins with "bing" to assign a postive or negative connotation to each word. Displays top 10 words in order using fct_reorder.
+guardian_words |>
+  inner_join(bing_sentiments) |>
+  filter(word != "trump") |> 
+  count(sentiment, word, sort = TRUE) |>
+  group_by(sentiment) |>
+  slice_max(n, n = 10) |>
+  ungroup() |>
+  ggplot(aes(x = fct_reorder(word, n), y = n, fill = sentiment)) +
+    geom_col() +  
+    coord_flip() +         #flips x and y axis
+    facet_wrap(~ sentiment, scales = "free") +
+  labs(
+       title = "Top Words by Sentiment (excluding 'trump')", 
+       x = "Word", 
+       y = "Count"
+       ) +
+  theme(legend.position = "none")
+```
+Positive sentiment words like best, win, like, and love contrast with negative words like crisis, death, and attack. The word ‘Trump’ was removed because sentiment cannot be objectively assigned to a proper noun. While overall tone shows contrasts between positive and negative framing, it is equally important to see how these patterns evolved in response to major events year by year.
+
+## Change Over Time
+
+```{r, fig.width=10, fig.height=8, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "The five most frequent non-stopwords in the Guardian dataset for each year, 2016–2022.", fig.alt= "This bar chart shows the five most frequent non-stopwords in Guardian articles for each year from 2016 to 2022, with 'covid' and 'coronavirus' combined under 'covid'. The chart is intended to highlight how word frequency changes over time. Each year has up to five bars representing the top words, with the height indicating the number of occurrences. Colors differentiate the words, and the bars are grouped by year along the horizontal axis, showing that certain words, such as 'covid', dominate in specific years while other words appear only in earlier years."}
+# top 5 most frequent words per year. ifelse to combine 'covid' and 'coronavirus'. 
+guardian_words |> 
+  anti_join(smart_stopwords, by = "word") |> 
+  mutate(word = ifelse(word %in% c("covid", "coronavirus"), "covid", word)) |> 
+  group_by(pub_year, word) |> 
+  summarise(n = n()) |> 
+  group_by(pub_year) |> 
+  slice_max(n, n = 5) |> 
+  ungroup() |> 
+  ggplot(aes(x = pub_year, y = n, fill = word)) +
+  geom_col() +
+  labs(
+       title = "Most Frequent Word per Year",
+       x = "Year", 
+       y = "Count",
+       fill = "Word"
+       ) +
+  theme_bw()
+```
+The plot highlights how headline vocabulary shifted with major global and political events. “Brexit” was dominant in 2016–2017, reflecting the referendum and its aftermath, while “Trump” featured consistently from 2016 through 2020. In 2020, “COVID” surged far beyond all other terms, peaking alongside terms such as ‘lockdown’ and ‘vaccine’ in 2020–2021, reflecting how the pandemic reshaped media attention. These shifts illustrate how headlines mirror public discourse, with dominant terms closely tied to the most pressing global issues of the time.
+
+In addition to changes across years, sentiment also varies depending on the section in which a headline appears.
+
+## Sentiment by Section
+```{r, fig.width=10, fig.height=8, message=FALSE, warning=FALSE, echo=FALSE, fig.cap= "Average sentiment of words in Guardian articles by section."}
+afinn <- get_sentiments("afinn")
+
+# Aggregate sentiment per section
+section_sentiment <- guardian_words |> 
+  inner_join(afinn, by = "word") |> 
+  filter(sectionName %in% c("News", "Opinion", "Sport", "Culture", "Business", "World news")) |> 
+  group_by(sectionName) |> 
+  summarise(
+    avg_word_sentiment = mean(value, na.rm = TRUE),  # average sentiment per word
+    median_word_sentiment = median(value, na.rm = TRUE),
+    n_words = n(),
+    .groups = "drop"
+  ) |> 
+  arrange(desc(avg_word_sentiment))
+
+section_sentiment |> 
+  ggplot(aes(x = reorder(sectionName, avg_word_sentiment), y = avg_word_sentiment, fill = avg_word_sentiment)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0, name = "Avg Sentiment") +
+  # creates a color scale for how strong of sentiment the section has
+  labs(
+    title = "Average Sentiment by Section",
+    x = "Section", 
+    y = "Average Word Sentiment"
+  ) +
+  theme_bw()
+```
+The sentiment analysis by section highlights variation in tone across Guardian coverage. Sport and Culture are the only two sections with predominantly positive sentiment. In contrast, Opinion, News, Business, and World news carry increasingly negative sentiment, with World news being the most negative overall. This distribution suggests that sections emphasizing commentary, current events, and financial coverage rely on more critical or pessimistic language, while of Culture and Sports coverage tend to adopt more neutral or favorable wording.
+
+```{r, fig.width=12, fig.height=8, message=FALSE, warning=FALSE, echo=FALSE, fig.cap= "The ten most frequent non-stopwords in each major Guardian section"}
+#faceted bar plot to show most common words across major Guardian sections 
+major_sections <- c("News", "Opinion", "Sport", "Culture", "Business", "World news")
+
+section_word_counts <- guardian_words |> 
+  filter(!word %in% c("trump", "guardian")) |>    #filter out the words "trump" and "guardian"
+  filter(sectionName %in% major_sections) |>      #filter sectionNAME to only include the major sections
+  anti_join(smart_stopwords, by = "word") |> 
+  count(sectionName, word, sort = TRUE) |> 
+  group_by(sectionName) |> 
+  slice_max(n, n = 10) |> 
+  ungroup() |> 
+  mutate(word = fct_reorder(word, n))             # globally reorders frequency from greatest to least
+
+ggplot(section_word_counts, aes(fct_reorder2(word, sectionName, -n), y = n, fill = sectionName)) + # reorders the bars within each facet
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ sectionName, scales = "free_y") +
+  coord_flip() +
+  labs(
+    title = "Top Words by Section (2016–2021)",
+    y = "Frequency",
+    x = "Word"
+  ) +
+  theme_bw() +
+  scale_fill_viridis_d()
+```
+The frequency analysis of top words by section further illustrates the thematic divides in coverage. Each section is defined by its own vocabulary, reflecting the issues and events that dominate that area of reporting. The prominence of certain recurring terms underscores how language choices shape tone and focus across sections. When considered alongside the sentiment analysis, the word frequency plot reinforces the idea that subject matter is closely tied to the tone conveyed, with structural differences in reporting leading to differences in sentiment.
+
+Together, frequency, sentiment, and section analysis illustrate the interaction between content volume, language, and tone across Guardian coverage.
+
+## Conclusion 
+This project shows how text analysis can reveal both the dominant topics and the tone of media coverage. Across 2016–2021, headline language tracked major world events such as Brexit, the Trump presidency, and the COVID-19 pandemic, with shifts in word frequency aligning closely with the timing of these developments. By removing common words and focusing on more meaningful terms, the analysis highlighted how global crises and political figures shaped headline priorities, while output differences between sections revealed the Guardian’s emphasis on current events and international reporting.
+
+Sentiment and section-level analysis added another layer of interpretation, showing that Sport and Culture coverage leaned more positive, while Opinion, News, Business, and World news sections carried a more negative tone. The top words in each section further reflected these divides, illustrating how language and sentiment interact with subject matter.
+
+## Sources
+
+[Guardian Kaggle dataset](https://www.kaggle.com/datasets/adityakharosekar2/guardian-news-articles)
+
+[The Kable Package](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html)

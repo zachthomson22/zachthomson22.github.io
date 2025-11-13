@@ -8,8 +8,8 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
       - The_Guardian_Text_Analysis.qmd
+      - about.qmd
 
 format:
   html:

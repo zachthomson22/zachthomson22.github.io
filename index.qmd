@@ -19,7 +19,7 @@ about:
 
 Hi! I am senior at St. Olaf College majoring in biology with a concentration in business & management studies.
 
-This website 
+The primary goal of this website is to display the data science projects I have worked on over the last few years. The panel at the _______ and shares a little more about me. All of the code used to produce these projects, including this website, can be found on my GitHub linked below.
 
 ## Education 
 

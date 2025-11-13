@@ -66,6 +66,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="styles.css">
@@ -93,12 +96,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link active" href="./The_Guardian_Text_Analysis.html" aria-current="page"> 
 <span class="menu-text"><em>The Guardian</em> Text Analysis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About Me</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -111,11 +114,25 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
+  <li><a href="#preparing-the-data" id="toc-preparing-the-data" class="nav-link" data-scroll-target="#preparing-the-data">Preparing the Data</a></li>
+  <li><a href="#word-frequencies" id="toc-word-frequencies" class="nav-link" data-scroll-target="#word-frequencies">Word Frequencies</a></li>
+  <li><a href="#sentiment-in-headlines" id="toc-sentiment-in-headlines" class="nav-link" data-scroll-target="#sentiment-in-headlines">Sentiment in Headlines</a></li>
+  <li><a href="#change-over-time" id="toc-change-over-time" class="nav-link" data-scroll-target="#change-over-time">Change Over Time</a></li>
+  <li><a href="#sentiment-by-section" id="toc-sentiment-by-section" class="nav-link" data-scroll-target="#sentiment-by-section">Sentiment by Section</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-page-left" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -124,7 +141,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="quarto-title-meta column-page">
+<div class="quarto-title-meta column-page-left">
 
     
   
@@ -136,8 +153,277 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The focus of this project is on the patterns in words and sentiment across Guardian publication years and sections. The dataset spans from 2016 - 2022, and includes 164 different article sections. Headlines are short, sharp strings of text designed to capture attention. Studying their structure and content offers insight into what issues dominated public conversation at different points in time, and how the tone of media shifted in response to political, social, and health events.</p>
+<p>The goals of this analysis are:</p>
+<ol type="1">
+<li><p>To identify the most common words across headlines.</p></li>
+<li><p>To examine how headline language changed by year.</p></li>
+<li><p>To explore sentiment in headline wording and whether certain tones dominated certain years and article sections.</p></li>
+</ol>
+</section>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p>The Guardian is a UK-based news outlet with global readership. Between 2016–2022, its coverage included major world events: Brexit (2016), the Trump presidency (2016–2020), COVID-19 (2020 onward), and global economic and political challenges. By analyzing title wording, we can identify recurring themes and shifts in tone, as well as the ways in which different sections of the paper highlight particular issues. To examine these shifts, the dataset requires cleaning and restructuring to make headlines comparable across years and sections.</p>
+</section>
+<section id="preparing-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="preparing-the-data">Preparing the Data</h2>
+<p>Before we can analyze text, we need to clean it. Headlines contain a mix of lowercase and uppercase words, punctuation, and numbers. For consistency, all titles were converted to lowercase, punctuation removed, and new columns created to capture year and headline length. There are over 160 different article sections in this dataset. For simplicity, analysis focuses on six major sections: Business, Culture, News, Opinion, Sport, and World news. The year 2022 was removed as the year was not complete was the dataset was created.</p>
+</section>
+<section id="word-frequencies" class="level2">
+<h2 class="anchored" data-anchor-id="word-frequencies">Word Frequencies</h2>
+<p>A simple frequency count shows which words dominate. However, many of these are common stopwords like “the” or “and.” Removing stopwords reveals more meaningful terms.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="The_Guardian_Text_Analysis_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>Frequency of the 20 most common non-stopwords in the Guardian dataset.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The top 20 non-stopwords plot highlights which words dominate headlines after common stopwords are removed. Words such as “Brexit,” “Trump,” and “COVID” align with major historical events, showing how headline language mirrors the public discourse of each year. For example, “Brexit” dominates in 2016–2017, “Trump” during 2016–2020, and “COVID” spikes in 2020. The prominence of these terms in News and World articles confirms that high-volume sections drive the most recurrent topics, while words in Opinion and Culture reflect evaluative or thematic content.</p>
+<p>Before interpreting the prominence of words, it is useful to consider which sections contribute the most content, since high-volume sections naturally influence overall frequency patterns.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<caption>Number of Guardian Articles by Section (2016–2021)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Section</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Year</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Number of Articles</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td rowspan="6" style="text-align: left; font-weight: bold; vertical-align: top !important;">Business</td>
+<td style="text-align: center;">2016</td>
+<td style="text-align: center; width: 6em;">1118</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2017</td>
+<td style="text-align: center; width: 6em;">891</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center; width: 6em;">1008</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2019</td>
+<td style="text-align: center; width: 6em;">999</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2020</td>
+<td style="text-align: center; width: 6em;">1217</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2021</td>
+<td style="text-align: center; width: 6em;">1168</td>
+</tr>
+<tr class="odd">
+<td rowspan="6" style="text-align: left; font-weight: bold; vertical-align: top !important;">Culture</td>
+<td style="text-align: center;">2016</td>
+<td style="text-align: center; width: 6em;">213</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2017</td>
+<td style="text-align: center; width: 6em;">204</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center; width: 6em;">241</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2019</td>
+<td style="text-align: center; width: 6em;">251</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2020</td>
+<td style="text-align: center; width: 6em;">339</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2021</td>
+<td style="text-align: center; width: 6em;">365</td>
+</tr>
+<tr class="odd">
+<td rowspan="6" style="text-align: left; font-weight: bold; vertical-align: top !important;">News</td>
+<td style="text-align: center;">2016</td>
+<td style="text-align: center; width: 6em;">155</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2017</td>
+<td style="text-align: center; width: 6em;">201</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center; width: 6em;">221</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2019</td>
+<td style="text-align: center; width: 6em;">238</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2020</td>
+<td style="text-align: center; width: 6em;">204</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2021</td>
+<td style="text-align: center; width: 6em;">204</td>
+</tr>
+<tr class="odd">
+<td rowspan="6" style="text-align: left; font-weight: bold; vertical-align: top !important;">Opinion</td>
+<td style="text-align: center;">2016</td>
+<td style="text-align: center; width: 6em;">1766</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2017</td>
+<td style="text-align: center; width: 6em;">2069</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center; width: 6em;">2077</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2019</td>
+<td style="text-align: center; width: 6em;">2018</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2020</td>
+<td style="text-align: center; width: 6em;">1806</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2021</td>
+<td style="text-align: center; width: 6em;">1621</td>
+</tr>
+<tr class="odd">
+<td rowspan="6" style="text-align: left; font-weight: bold; vertical-align: top !important;">Sport</td>
+<td style="text-align: center;">2016</td>
+<td style="text-align: center; width: 6em;">1706</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2017</td>
+<td style="text-align: center; width: 6em;">1661</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center; width: 6em;">1597</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2019</td>
+<td style="text-align: center; width: 6em;">1579</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2020</td>
+<td style="text-align: center; width: 6em;">1404</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2021</td>
+<td style="text-align: center; width: 6em;">1720</td>
+</tr>
+<tr class="odd">
+<td rowspan="6" style="text-align: left; font-weight: bold; vertical-align: top !important;">World news</td>
+<td style="text-align: center;">2016</td>
+<td style="text-align: center; width: 6em;">1831</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2017</td>
+<td style="text-align: center; width: 6em;">1729</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center; width: 6em;">2034</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2019</td>
+<td style="text-align: center; width: 6em;">2050</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2020</td>
+<td style="text-align: center; width: 6em;">3619</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2021</td>
+<td style="text-align: center; width: 6em;">2789</td>
+</tr>
+</tbody>
+</table>
 
 
+</div>
+</div>
+<p>This table summarizes the number of Guardian articles published in six key sections between 2016 and 2021, excluding the incomplete year 2022. It highlights trends in content production across sections and years, showing which sections consistently generate the most coverage reflecting the Guardian’s emphasis on reporting current events and international affairs. News and Culture sections have smaller, more variable output, suggesting more selective or theme-driven coverage. This distribution provides context for interpreting word frequency and sentiment: high-volume sections naturally contribute more to the dataset’s overall language patterns, while lower-volume sections introduce distinctive or evaluative terms.</p>
+</section>
+<section id="sentiment-in-headlines" class="level2">
+<h2 class="anchored" data-anchor-id="sentiment-in-headlines">Sentiment in Headlines</h2>
+<p>Beyond frequency, it is useful to examine the sentiment, or tone of headlines.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="The_Guardian_Text_Analysis_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>The ten most frequent words associated with positive and negative sentiment in the Guardian dataset.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Positive sentiment words like best, win, like, and love contrast with negative words like crisis, death, and attack. The word ‘Trump’ was removed because sentiment cannot be objectively assigned to a proper noun. While overall tone shows contrasts between positive and negative framing, it is equally important to see how these patterns evolved in response to major events year by year.</p>
+</section>
+<section id="change-over-time" class="level2">
+<h2 class="anchored" data-anchor-id="change-over-time">Change Over Time</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="The_Guardian_Text_Analysis_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" alt="This bar chart shows the five most frequent non-stopwords in Guardian articles for each year from 2016 to 2022, with 'covid' and 'coronavirus' combined under 'covid'. The chart is intended to highlight how word frequency changes over time. Each year has up to five bars representing the top words, with the height indicating the number of occurrences. Colors differentiate the words, and the bars are grouped by year along the horizontal axis, showing that certain words, such as 'covid', dominate in specific years while other words appear only in earlier years." width="960"></p>
+<figcaption>The five most frequent non-stopwords in the Guardian dataset for each year, 2016–2022.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot highlights how headline vocabulary shifted with major global and political events. “Brexit” was dominant in 2016–2017, reflecting the referendum and its aftermath, while “Trump” featured consistently from 2016 through 2020. In 2020, “COVID” surged far beyond all other terms, peaking alongside terms such as ‘lockdown’ and ‘vaccine’ in 2020–2021, reflecting how the pandemic reshaped media attention. These shifts illustrate how headlines mirror public discourse, with dominant terms closely tied to the most pressing global issues of the time.</p>
+<p>In addition to changes across years, sentiment also varies depending on the section in which a headline appears.</p>
+</section>
+<section id="sentiment-by-section" class="level2">
+<h2 class="anchored" data-anchor-id="sentiment-by-section">Sentiment by Section</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="The_Guardian_Text_Analysis_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>Average sentiment of words in Guardian articles by section.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The sentiment analysis by section highlights variation in tone across Guardian coverage. Sport and Culture are the only two sections with predominantly positive sentiment. In contrast, Opinion, News, Business, and World news carry increasingly negative sentiment, with World news being the most negative overall. This distribution suggests that sections emphasizing commentary, current events, and financial coverage rely on more critical or pessimistic language, while of Culture and Sports coverage tend to adopt more neutral or favorable wording.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="The_Guardian_Text_Analysis_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="1152"></p>
+<figcaption>The ten most frequent non-stopwords in each major Guardian section</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The frequency analysis of top words by section further illustrates the thematic divides in coverage. Each section is defined by its own vocabulary, reflecting the issues and events that dominate that area of reporting. The prominence of certain recurring terms underscores how language choices shape tone and focus across sections. When considered alongside the sentiment analysis, the word frequency plot reinforces the idea that subject matter is closely tied to the tone conveyed, with structural differences in reporting leading to differences in sentiment.</p>
+<p>Together, frequency, sentiment, and section analysis illustrate the interaction between content volume, language, and tone across Guardian coverage.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>This project shows how text analysis can reveal both the dominant topics and the tone of media coverage. Across 2016–2021, headline language tracked major world events such as Brexit, the Trump presidency, and the COVID-19 pandemic, with shifts in word frequency aligning closely with the timing of these developments. By removing common words and focusing on more meaningful terms, the analysis highlighted how global crises and political figures shaped headline priorities, while output differences between sections revealed the Guardian’s emphasis on current events and international reporting.</p>
+<p>Sentiment and section-level analysis added another layer of interpretation, showing that Sport and Culture coverage leaned more positive, while Opinion, News, Business, and World news sections carried a more negative tone. The top words in each section further reflected these divides, illustrating how language and sentiment interact with subject matter.</p>
+</section>
+<section id="sources" class="level2">
+<h2 class="anchored" data-anchor-id="sources">Sources</h2>
+<p><a href="https://www.kaggle.com/datasets/adityakharosekar2/guardian-news-articles">Guardian Kaggle dataset</a></p>
+<p><a href="https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html">The Kable Package</a></p>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -562,4 +848,5 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
