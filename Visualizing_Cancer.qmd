@@ -1,0 +1,264 @@
+---
+title: "Visualizing Cancer Prevalence and its Disparities in the United States"
+execute:
+  eval: false
+format:
+  html:
+    toc: true
+---
+
+## Introduction
+In 2024, nearly 2.0 million people are estimated to be diagnosed with cancer, and about 611,720 are expected to die from it in the United States, making cancer one of the greatest challenges people face [^1]. However, the challenge may be greater for some than for others. If consistent access to healthcare is related to the effect of cancer on a population, the resultant cancer disparity would illustrate a simple way to improve cancer outcomes. To shed light on the effect healthcare availability has on cancer, we will investigate the prevalence of cancer among adults, particularly how it corresponds to socioeconomic factors observed through the frequency a person receives routine health checkups and the prevalence of lack of health insurance among adults. The underlying focus of our investigation is whether routine checkups impact cancer prevalence, and how economic issues such as lower prevalence of health insurance and housing and food insecurity can factor into the relationship between checkups and cancer prevalence. We hope to demonstrate trends across the United States and the disparities between regions and socioeconomic statuses. Routine checkups may have a positive relationship with cancer prevalence, as with fewer checkups more cancer may go undetected; either way, we think it will be interesting to visualize this relationship and how different groups are impacted.
+
+[^1]: “Cancer Stat Facts: Common Cancer Sites.” National Cancer Institute , SEER, seer.cancer.gov/statfacts/html/common.html. Accessed 24 Nov. 2024.
+
+PLACES (Population Level Analysis and Community Estimates) is 2024 health census data that covers all 50 states, including the District of Columbia, and is an expansion of a project that looked at the 500 largest cities in the US. For several of the plots, the states are placed into regions in order to view trends across the US, Hawaii and Alaska are put into the West Coast region. PLACES was funded by the Robert Wood Johnson Foundation in conjunction with the CDC. The data is estimated from models built on various other CDC surveys, including the Behavioral Risk Factor Surveillance System (BRFSS) surveys and the American Community Survey (ACS). These source surveys include iterations from a wide range of years, from population data collected in 2010 to the BRFSS 2022 data. The dataset contains 83,522 observations and 88 variables. We will focus on a few key variables including state, county, census tract number, prevalence of cancer among adults (past year), access to routine checkups (in the past year, 2022), lack of insurance healthcare, and housing and food insecurity. All numerical health measures used are reported as a "crude prevalence". Prevalence refers to the proportion (given as a percent) of the variable in the respective census tract FIPS code. A census tract code is an 11-digit number that uniquely identifies a census tract in the United States. It's made up of three parts: 2-digits that identify the state, 3-digits that identify the county, and 6-digits that identify the census tract. For more information, the data and a short description given by the CDC can be accessed here: <https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2024-/yjkw-uj5s/about_data>
+
+## Visualizing the Data
+```{r, include=FALSE, message=FALSE}
+library(tidyverse)
+library(viridis)
+library(kableExtra)
+library(forcats)
+library(scales)
+```
+
+```{r, include=FALSE, message=FALSE}
+#setwd("~/Sds 164 F24/Project/Evans_Thomson/FINAL PROJECT/")
+PLACES_CENSUS <- read_csv("PLACES__Census_Tract_Data__GIS_Friendly_Format___2024_release_20241001.csv")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Figure 1. Cancer prevalence is positively correlated with routine checkup prevalence and varies regionally with health insurance rates. Data are from the 2024 PLACES Census Tract dataset, which includes state-level metrics: routine checkup prevalence (%), cancer prevalence (%), and health insurance prevalence (%). Prevalence represents the percentage of individuals in a census tract with the specified characteristic. States are grouped into four regions (West Coast, South, East Coast, Midwest) for comparison. Each panel includes the regional mean cancer prevalence (dashed gray line) and fitted linear regression lines (blue) to highlight trends. Sample size covers all U.S. census tracts grouped by region.", fig.alt = "This faceted scatter plot has four panels, one for each U.S. region: West Coast, South, East Coast, and Midwest. The x-axis shows routine checkup prevalence ranging from 50% to 90%, and the y-axis shows cancer prevalence ranging frm 0% to 30%. Data points are color-coded by lack of health insurance, with blue represeting low and yellow high. Dashed gray lines mark mean cancer prevalence for each region, with dark blue regression lines highlighting positive associations between routine checkups and cancer prevalence.", fig.width=10 }
+
+# Group states into four regions, calculate each one's mean prevalence of cancer, and plot scatter plots
+
+PLACES_CENSUS |> 
+   mutate(Regions = fct_collapse(StateAbbr, "Midwest" = c("IL", "IN", "IA", "KS", "MI", "MN", "MO", "NE", "ND", "OH", "SD", "WI"),
+                                          "South" = c("AL", "AR", "FL", "GA", "KY", "LA", "MS", "NC", "OK", "SC", "TN", "TX", "VA",
+                                                      "WV"),
+                                          "East Coast" = c("CT", "DE", "ME", "MD", "MA", "NH", "NJ", "NY", "PA", "RI", "VT", "DC"),
+                                          "West Coast" = c("AK", "AZ", "CA", "CO", "HI", "ID", "MT", "NV", "NM", "OR", "UT", "WA",
+                                                           "WY"))) |>    # creates the four different regions
+  drop_na() |>
+  group_by(Regions) |> 
+  mutate(region_mean_cancer = mean(CANCER_CrudePrev)) |>  # calculates the mean cancer prevalence 
+  ggplot(aes(x = CHECKUP_CrudePrev, y = CANCER_CrudePrev, color = ACCESS2_CrudePrev)) +
+  geom_jitter(alpha = 0.4, size = 2) + # sets transparency and size of points
+  geom_smooth(method= "lm", color = "darkblue") +
+  geom_hline(aes(yintercept = region_mean_cancer), color = "gray", linetype = "dashed") +  # adds the dashed gray line in each panel
+  facet_wrap(~Regions) + # facets the figure by region
+  labs(title = "Cancer Rates vs Routine Checkups & Lack of Health Insurance by Region",
+    x = "Routine Checkup Prevalence (%)",
+    y = "Cancer Prevalence (%)",
+    color = "Lack of Health Insurance (%)") +
+  scale_color_viridis_c(trans="log",option="plasma",labels = label_number(accuracy = 0.1)) +
+  theme_bw() +
+  theme(legend.position = "bottom")  # moves the legend to the bottom
+```
+In all four regions, there is a positive association between cancer prevalence and routine checkup prevalence, reflecting improved cancer detection in areas with better healthcare access. However, disparities emerge, as the South and Midwest exhibit slightly lower mean cancer prevalence than the East and West Coasts despite similar trends. The color gradient highlights areas with lower health insurance prevalence, emphasizing its impact on regional variation by restricting access to routine checkups and reducing early cancer detection rates. The South has noticeably more yellow dots than other regions, indicating higher levels of uninsured individuals. The cluster of yellow dots in the South corresponds to Texas, as shown in the maps below.
+
+```{r, echo=FALSE}
+
+# Generate a table of summary statistics for each region
+
+PLACES_CENSUS |> 
+  mutate(Regions = fct_collapse(StateAbbr, "Midwest" = c("IL", "IN", "IA", "KS", "MI", "MN", "MO", "NE", "ND", "OH", "SD", "WI"),
+                                          "South" = c("AL", "AR", "FL", "GA", "KY", "LA", "MS", "NC", "OK", "SC", "TN", "TX", "VA",
+                                                      "WV"),
+                                          "East Coast" = c("CT", "DE", "ME", "MD", "MA", "NH", "NJ", "NY", "PA", "RI", "VT", "DC"),
+                                          "West Coast" = c("AK", "AZ", "CA", "CO", "HI", "ID", "MT", "NV", "NM", "OR", "UT", "WA",
+                                                           "WY"))) |> 
+  group_by(Regions) |> 
+  filter(Regions %in% c("East Coast", "Midwest", "South", "West Coast")) |> 
+  summarize(mean_routine_checkup = mean(CHECKUP_CrudePrev),
+            mean_healthcare = mean(ACCESS2_CrudePrev),
+            mean_cancer = mean(CANCER_CrudePrev)) |> 
+  mutate(mean_cancer = round(mean_cancer, 2),
+       mean_healthcare = round(mean_healthcare, 2),
+       mean_routine_checkup = round(mean_routine_checkup, 2)) |> 
+  kable(col.names = c("Region", "Average Checkup Prevalence", "Average Lack of Health Insurance", "Average Cancer Prevalance"),
+        caption = "Health Statistics by Region (%)") |> 
+  kable_styling(bootstrap_options = c("striped", "hover"), position = "center")
+```
+Table 1: Average checkup prevalence, lack of health insurance rates, and cancer prevalence by U.S. region. Data are sourced from the 2024 PLACES Census Tract dataset. Values are averaged within regions and presented as percentages, rounded to two decimal places for clarity. Sample size covers all US census tracts.
+
+The table highlights regional disparities in health measures across the United States. The East Coast leads in average checkup prevalence (78.32%) and has the lowest average lack of health insurance (8.34%), suggesting better access to preventative care and healthcare services. In contrast, the South has the highest rate of uninsured individuals (15.07%) but relatively high checkup prevalence (76.92%), indicating that while many residents prioritize health checkups, systemic issues like lower income levels or gaps in healthcare expansion may limit insurance coverage. While cancer prevalence is similar across all the regions, the Midwest shows the highest average (8.28%), potentially linked to demographic factors such as an aging population or higher prevalence of cancer risk behaviors like smoking. The West Coast, with the lowest cancer prevalence (7.55%), might benefit from healthier lifestyles and policies supporting preventive care. These trends underline the influence of socioeconomic, behavioral, and policy-driven factors on regional health outcomes.
+```{r, echo=FALSE, message=FALSE, fig.cap = "Figure 3. Cancer prevalence is negatively correlated with housing insecurity, with food insecurity adding to disparities. Data are from the 2024 PLACES Census Tract dataset, measuring cancer prevalence (%), housing insecurity (%), and food insecurity (%) across U.S. regions (West Coast, South, East Coast, and Midwest). Panels show scatter plots with regression lines for each region. Sample size includes all US census tracts.", fig.alt= "This scatter plot has four panels for different regions of the United States, West Coast, South, East Coast, and the Midwest. The x axis represents housing insecurity as a percent ranging from 0% to 50% and the y axis shows cancer prevalence also as a percent ranging from 0% to 25%. The points are color-coded by food insecurity percentage, with higher food insecurity shown in darker shades. A dark blue regresion line in each panel shows a negative relationship between housing insecurity and cancer prevalence, with the higher food insecurity rates increasing with hosuing insecurity.", fig.width=10}
+
+# Creates a faceted scatter plot by region for housing insecurity, cancer prevalence, and food insecurity.
+
+PLACES_CENSUS |> 
+  mutate(Regions = fct_collapse(StateAbbr, "Midwest" = c("IL", "IN", "IA", "KS", "MI", "MN", "MO", "NE", "ND", "OH", "SD", "WI"),
+                                          "South" = c("AL", "AR", "FL", "GA", "KY", "LA", "MS", "NC", "OK", "SC", "TN", "TX", "VA",
+                                                      "WV"),
+                                          "East Coast" = c("CT", "DE", "ME", "MD", "MA", "NH", "NJ", "NY", "PA", "RI", "VT", "DC"),
+                                          "West Coast" = c("AK", "AZ", "CA", "CO", "HI", "ID", "MT", "NV", "NM", "OR", "UT", "WA",
+                                                           "WY"))) |> 
+  drop_na() |> 
+  ggplot(aes(x = HOUSINSECU_CrudePrev, y = CANCER_CrudePrev, color = FOODINSECU_CrudePrev)) +
+  geom_jitter(alpha = 0.5, size = 2.5) +  
+  geom_smooth(method = "lm", color = "darkblue", linetype = "solid") +  # regression line without confidence intervals and a solid line
+  facet_wrap(~ Regions) + 
+  labs(title = "Cancer Prevalence, Housing Insecurity, and Food Insecurity by Region",
+       x = "Housing Insecurity (%)",
+       y = "Cancer Prevalence (%)",
+       color = "Food Insecurity (%)") +
+  scale_color_viridis_c(option="plasma") +  
+  theme_bw() +
+  theme(legend.position = "bottom") # moves the legend below the figure
+```
+The plots illustrate a negative association between housing insecurity and cancer prevalence, suggesting that individuals in higher housing-insecure areas may face barriers to healthcare and cancer diagnosis. Food insecurity, represented by the blue to yellow color gradient, is generally higher in areas with greater housing insecurity, exacerbating disparities. This trend suggests that individuals in areas with greater housing insecurity face barriers to accessing healthcare or diagnosis. These findings align with research showing that about 16.6% of cancer survivors had moderate to increased level of housing insecurity, which can further emphasize health inequities [^2].
+
+[^2]: Coughlin, Steven  S. “Housing Insecurity among Cancer Survivors: Results from the 2017 Behavioral Risk Factor Surveillance System Survey.” Journal of Cancer Policy, Elsevier, 31 Dec. 2021, www.sciencedirect.com/science/article/pii/S2213538321000515?via%3Dihub
+
+```{r, echo=FALSE, message=FALSE, fig.cap = "Figure 4. Lack of health insurance is positively associated with housing insecurity. Data are from the PLACES: Census Tract Data, measuring the percentage of individuals within census tracts lacking health insurance and experiencing housing insecurity. Each point represents a census tract, with a linear regression line (blue) illustrating the positive relationship. Sample size includes all U.S. census tracts.", fig.alt = "This scatter plot shows the relationship between the lack of health insurance as a percent on the x axis, ranging from 0% to 60%, and housing insecurity as a percent on the y axis, ranging from 0% to about 50%. Each dot represents a U.S. census tract, with the points forming a triangular shape that widens at higher levels of housing insecurity. A dark blue linear regression line indicates a positive association between the two variables, demostrating that as the lack of health insurance increases, housing insecurity also tends to increase.", fig.width=10}
+
+# Scatter plot with regression line
+
+PLACES_CENSUS |> 
+  drop_na() |> 
+  ggplot(aes(x = ACCESS2_CrudePrev, y = HOUSINSECU_CrudePrev)) +
+  geom_point(alpha = 0.6, size = 3, color = "steelblue") +  # Set point size and transparency
+  geom_smooth(method = "lm", color = "darkblue", linewidth = 1, se = FALSE) +  # Regression line without confidence interval
+  labs(
+    title = "Health Insurance and Housing Insecurity",
+    x = "Lack of Health Insurance (%)",
+    y = "Housing Insecurity (%)") +
+  theme_bw()
+```
+The graph indicates a positive association between the lack of health insurance and housing insecurity, suggesting that individuals without health insurance are more likely to experience housing insecurity. This trend highlights the interconnectedness of socioeconomic factors that may indirectly contribute to cancer prevalence, as both housing insecurity and lack of health insurance are known barriers to accessing preventative care and timely cancer diagnoses [^3]. The widening spread of housing insecurity at higher levels of uninsured populations suggests regional or systemic disparities that could worsen health inequities.
+
+[^3]: Abdelsattar, Zaid M, et al. “The Impact of Health Insurance on Cancer Care in Disadvantaged Communities.” NIH, U.S. National Library of Medicine, 1 Apr. 2017, pmc.ncbi.nlm.nih.gov/articles/PMC5360496/#:\~:text=Despite%20significant%20strides%20in%20overall,from%20receiving%20optimal%20cancer%20care.&text=Individuals%20without%20health%20insurance%20lack,stage%20and%20have%20worse%20outcomes.
+
+```{r, echo=FALSE, message = FALSE, fig.cap = "Figure 5. Prevalence of cancer is positively correlated with access to health insurance. However, the points and box plots show the range and variability in prevalence of cancer for each health insurance level. While there is a lot of variability in color, representing prevalence of health checkups, its positive relationship with cancer prevalence is also evident. Each point represents the average percentages for a county, rather than a tract, in order to make the points more visible. Tract level data was taken from the 2024 PLACES Census Tract dataset and the variable representing lack of health insurance was transformed into a categorical variable. Sample size includes all U.S. census tracts.", fig.alt = "This is a layered box and scatter plot. The x axis represents prevalence of cancer, from zero to just over fifteen percent, while the y axis represents prevalence of lack of health insurance, taken in four groups: less than 8 percent, 8 to 11 percent, 11 to fifteen percent, and greater than fifteen percent. The points are all coded continuously by prevalence of health checkups, from 60 to 85 percent. The plot shows that the prevalence of lack of health insurance decreases as the average prevalence of cancer increases. Health checkups appear to be positively correlated with prevalence of cancer.", fig.width = 10}
+
+PLACES_CENSUS |>
+  # compress data points into counties
+  group_by(CountyName) |>
+  summarise(
+    mean_access = mean(ACCESS2_CrudePrev), 
+    mean_cancer = mean(CANCER_CrudePrev),
+    mean_checkups = mean(CHECKUP_CrudePrev)
+  ) |>
+  # transform numerical insurance access variable into a categorical one
+  mutate(
+    HI_factor = ifelse(mean_access < 8, "<8%", ifelse(mean_access < 11, "8% - 11%", ifelse(mean_access < 15, "11% - 15%", ">15%"))),
+    HI_factor = fct_relevel(HI_factor, "<8%", "8% - 11%", "11% - 15%")
+  ) |>
+  # plot
+  ggplot(aes(x = mean_cancer, y = HI_factor)) +
+    geom_jitter(aes(color = mean_checkups), alpha = .6, size = 3) +  # first layer is the scatter plot
+    geom_boxplot(                                                    # second layer superimposes box plots
+      alpha = .3, 
+      color = "darkblue", 
+      fill="#fde2a3", 
+      outliers = FALSE, 
+      size = .8
+    ) +   
+    scale_color_viridis_c(option="plasma") + 
+    theme_bw() +
+    labs(
+      title = "Cancer by Access to Health Insurance for U.S. Counties",
+      subtitle = "Colored by checkup prevalence",
+      x = "Prevalence of Cancer (%)",
+      y = "Lack of Health Insurance (%)",
+      color = "Prevalence of Health Checkups (%)")
+```
+
+In this graph, a few previous correlations are reiterated. The box plots show a steady increase in prevalence of cancer as lack of health insurance decreases. As before, we interpret this as meaning that the variable representing prevalence of cancer in our data set would more accurately be described as representing prevalence of *detected* cancer, while, for people without health insurance, cancer is less likely to be discovered before it is too late. Likewise, prevalence of health checkups appears to be positively correlated with access to health insurance, and thus to prevalence of cancer. 
+
+However, it would be easy to conclude from that information alone that there exists a causal relationship between lower income groups without health insurance, regular checkups, and cancer; this plot separates the individual points, which now represent counties, so that the variation in each health insurance category is clear. In fact, the scatter plot allows us to see that there are some outliers in the 8 - 11 and 11 - 15 percent groups with higher prevalences of cancer than the group with the most access to health insurance, illustrating that this is a complex issue, of which we are only observing two dimensions. We approach the question in this way because we would like to avoid deficit thinking.
+
+```{r, eval = FALSE, echo = FALSE, message = FALSE}
+
+# The R server does not have enough memory to run this code, so I ran it on my laptop to generate the following two plots
+# I leave comments to help describe what is going on
+
+library(tigris)
+stateshapes = states()
+library(tidyverse)
+library(sf)
+
+# read the data in
+PLACES <- read_csv("PLACES__Census_Tract_Data__GIS_Friendly_Format___2024_release_20241001.csv")
+
+# this pipeline compresses the data into counties
+PLACES <- PLACES |>
+  select(StateDesc, CANCER_CrudePrev, CountyFIPS, ACCESS2_CrudePrev, HOUSINSECU_CrudePrev, CHECKUP_CrudePrev) |>
+  group_by(CountyFIPS, StateDesc) |>
+  summarize( 
+    CANCER_CrudePrev = mean(CANCER_CrudePrev, na.rm = TRUE),
+    ACCESS2_CrudePrev = mean(ACCESS2_CrudePrev, na.rm = TRUE),
+    HOUSINSECU_CrudePrev = mean(HOUSINSECU_CrudePrev, na.rm = TRUE),
+    CHECKUP_CrudePrev = mean(CHECKUP_CrudePrev, na.rm = TRUE)
+  ) |>
+  ungroup()
+
+# extract a list of every state for the upcoming for loop
+states <- PLACES |>
+  count(StateDesc) |>
+  select(StateDesc)
+
+# temp variable to store county shapes
+allcounties <- 0
+
+# build the plot as the loop progresses through each state
+fullplot <- ggplot() +
+  theme_minimal()
+
+# the main loop
+for (state_ in states) {
+  # clear resources dedicated to previous county shapes
+  rm(allcounties)
+  gc()
+  
+  # get the counties from the library
+  allcounties <- counties(state=state_, year=2022) |>
+    rename(CountyFIPS = GEOID)
+  
+  # reduce shape complexity to conserve system resources
+  allcounties <- st_simplify(allcounties, dTolerance = 0.1)
+  
+  # merge (join) county shapes to the health insurance data
+  merged <- merge(allcounties, PLACES, by="CountyFIPS")
+  
+  # plot the state and add it to the full plot
+  fullplot <- fullplot +
+    geom_sf(data = merged, mapping = aes(fill = ACCESS2_CrudePrev), color=NA)
+  
+  print(paste("Completed state: ",state_))
+}
+
+# Add borders to the full plot as a new layer
+fullplot <- fullplot +
+  geom_sf(data = stateshapes, color = "white", fill=NA) +
+  scale_fill_viridis_c(option="c") +
+  coord_sf(xlim = c(-128, -60), ylim = c(50, 20), expand = FALSE) +
+  labs(
+    title = "Lack of Health Insurance by County (%)",
+    fill = "Prevalence (%)"
+  ) +
+  theme(legend.position = c(.95, 0.5))
+
+# save the plot as an image
+ggsave("rstudiobad.png", plot = fullplot, width = 10, height = 8, dpi = 500)
+```
+
+```{r, echo=FALSE, fig.cap = "Figure 6. Lack of health insurance is critically prevalent next to the border in Texas. The extremity of these counties, 30% - 50% of the populations of which lack health insurance, even makes it difficult to discern country-wide trends. According to the trends observed above, this area likely has less regular health checkups and thus more undetected instances of cancer. In order to create the map, averages were taken across all tracts within contiguous U.S. counties, which were colored accordingly. A border layer was drawn on top, and noncontiguous states were cropped out for readibility. Data are from the 2024 PLACES Census Tract dataset and the sample size includes all US census tracts.", fig.alt="A colored map of counties in the United States. The color corresponds to the average percentage of lack of health insurance among tracts within that county, ranging from almost zero percent uninsured to fifty percent uninsured. The map highlights how the Texan counties on the border with Mexico have the greatest levels of lack of health insurance."}
+knitr::include_graphics("map (2).png")
+```
+
+A map of lack of health insurance by contiguous U.S. county mostly highlights how extreme Southern and Eastern Texan counties are. Variation among other regions is more difficult to identify. Thus, we also provide a map with Texas removed.
+
+```{r, echo=FALSE, fig.cap = "Figure 7. After removing Texas, it is easier to see that lack of health insurance is more prevalent in the South, particularly the deep South, as well as the noncoastal West and central counties in Washington and California. The Northeast states have the least prevalence of lack of health insurance. Data are from the 2024 PLACES Census Tract dataset and the sample size includes all US census tracts.", fig.alt="Another colored map of counties in the United States. This time, Texas is removed. The color still corresponds to the average percentage of lack of health insurance among tracts within that county, ranging from almost zero percent uninsured to, now, thirty percent uninsured. The map shows a general trend where the South and Western regions of the United States have less access to health insurance than the Northeast."}
+knitr::include_graphics("map3.png")
+```
+
+Now, it is evident that the Northeastern United States, as well as some counties on the West coast, have the highest access to health insurance. According to our previous plots, the other regions identified in these two maps likely have the greatest prevalence of undetected cancer instances. Keeping Texas in mind, there are a few potential factors that might be related to the geographical distribution we observe: migration, political leaning, and broad population density all exhibit trends that could be identified as similar to this one. On the other hand, without examining these variables alongside our data, county-by-county, it is impossible to say what factors are truly influential on this variation.
+
+## Conclusion
+This project highlights the significant regional disparities in health outcomes across the United States, focusing on cancer prevalence, healthcare access, and socioeconomic factors such as housing and food insecurity. Through the analysis of PLACES Census Tract Data, we observed varying relationships between health indicators, including a negative correlation between housing insecurity and cancer prevalence. These trends suggest that regions with higher levels of housing insecurity may face barriers to healthcare access, potentially leading to undetected cancer cases. Furthermore, a positive association between lack of health insurance and housing insecurity reinforces the interconnectedness of socioeconomic factors that contribute to health disparities.
+
+The geographic maps further illustrated the extreme lack of health insurance in areas like the Texas, where access to care is particularly limited. This reinforces the need for targeted policy interventions in regions with high uninsured populations, particularly in the South and West, where lack of health insurance is more prevalent. Still, the data shows a high level of variation alongside the strong trends that are present, so such policies would ideally be implemented on a granular level that meets the needs of specific communities. 
+
+Ultimately, this project emphasizes the critical role of socioeconomic factors in shaping health outcomes, with access to healthcare services, housing, and food security directly influencing cancer prevalence and detection. Addressing these disparities requires comprehensive policy solutions that not only focus on healthcare access but also tackle underlying socioeconomic inequalities that disproportionately affect vulnerable populations ^[Andrew Matthius, Emma Quinn. “Walking the Talk: Intervention Programs Aiming to Close the Cancer Care Gap.” American Association for Cancer Research (AACR), 6 Nov. 2024, www.aacr.org/blog/2024/11/05/walking-the-talk-intervention-programs-aiming-to-close-the-cancer-care-gap/.].
