@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Visualizing Cancer Prevalence and its Disparities in the United States – Zach Thomson</title>
+<title>Choropleth Maps – Zach Thomson</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d1b12f2568ecbe55642fee6aa00bd082.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-d1b12f2568ecbe55642fee6aa00bd082.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -66,9 +66,10 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<style>html{ scroll-behavior: smooth; }</style>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -78,7 +79,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Zach Thomson</span>
     </a>
   </div>
@@ -89,15 +90,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./The_Guardian_Text_Analysis.html"> 
+    <a class="nav-link" href="../The_Guardian_Text_Analysis.html"> 
 <span class="menu-text"><em>The Guardian</em> Text Analysis</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./choropleth_maps.html"> 
+    <a class="nav-link" href="../choropleth_maps.html"> 
 <span class="menu-text">Hospital Spening Choropleth Maps</span></a>
   </li>  
 </ul>
@@ -117,8 +118,6 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#visualizing-the-data" id="toc-visualizing-the-data" class="nav-link" data-scroll-target="#visualizing-the-data">Visualizing the Data</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -127,7 +126,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Visualizing Cancer Prevalence and its Disparities in the United States</h1>
+<h1 class="title">Choropleth Maps</h1>
 </div>
 
 
@@ -146,40 +145,11 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In 2024, nearly 2.0 million people are estimated to be diagnosed with cancer, and about 611,720 are expected to die from it in the United States, making cancer one of the greatest challenges people face <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. However, the challenge may be greater for some than for others. If consistent access to healthcare is related to the effect of cancer on a population, the resultant cancer disparity would illustrate a simple way to improve cancer outcomes. To shed light on the effect healthcare availability has on cancer, we will investigate the prevalence of cancer among adults, particularly how it corresponds to socioeconomic factors observed through the frequency a person receives routine health checkups and the prevalence of lack of health insurance among adults. The underlying focus of our investigation is whether routine checkups impact cancer prevalence, and how economic issues such as lower prevalence of health insurance and housing and food insecurity can factor into the relationship between checkups and cancer prevalence. We hope to demonstrate trends across the United States and the disparities between regions and socioeconomic statuses. Routine checkups may have a positive relationship with cancer prevalence, as with fewer checkups more cancer may go undetected; either way, we think it will be interesting to visualize this relationship and how different groups are impacted.</p>
-<p>PLACES (Population Level Analysis and Community Estimates) is 2024 health census data that covers all 50 states, including the District of Columbia, and is an expansion of a project that looked at the 500 largest cities in the US. For several of the plots, the states are placed into regions in order to view trends across the US, Hawaii and Alaska are put into the West Coast region. PLACES was funded by the Robert Wood Johnson Foundation in conjunction with the CDC. The data is estimated from models built on various other CDC surveys, including the Behavioral Risk Factor Surveillance System (BRFSS) surveys and the American Community Survey (ACS). These source surveys include iterations from a wide range of years, from population data collected in 2010 to the BRFSS 2022 data. The dataset contains 83,522 observations and 88 variables. We will focus on a few key variables including state, county, census tract number, prevalence of cancer among adults (past year), access to routine checkups (in the past year, 2022), lack of insurance healthcare, and housing and food insecurity. All numerical health measures used are reported as a “crude prevalence”. Prevalence refers to the proportion (given as a percent) of the variable in the respective census tract FIPS code. A census tract code is an 11-digit number that uniquely identifies a census tract in the United States. It’s made up of three parts: 2-digits that identify the state, 3-digits that identify the county, and 6-digits that identify the census tract. For more information, the data and a short description given by the CDC can be accessed here: <a href="https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2024-/yjkw-uj5s/about_data" class="uri">https://data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2024-/yjkw-uj5s/about_data</a></p>
-</section>
-<section id="visualizing-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="visualizing-the-data">Visualizing the Data</h2>
-<p>In all four regions, there is a positive association between cancer prevalence and routine checkup prevalence, reflecting improved cancer detection in areas with better healthcare access. However, disparities emerge, as the South and Midwest exhibit slightly lower mean cancer prevalence than the East and West Coasts despite similar trends. The color gradient highlights areas with lower health insurance prevalence, emphasizing its impact on regional variation by restricting access to routine checkups and reducing early cancer detection rates. The South has noticeably more yellow dots than other regions, indicating higher levels of uninsured individuals. The cluster of yellow dots in the South corresponds to Texas, as shown in the maps below.</p>
-<p>Table 1: Average checkup prevalence, lack of health insurance rates, and cancer prevalence by U.S. region. Data are sourced from the 2024 PLACES Census Tract dataset. Values are averaged within regions and presented as percentages, rounded to two decimal places for clarity. Sample size covers all US census tracts.</p>
-<p>The table highlights regional disparities in health measures across the United States. The East Coast leads in average checkup prevalence (78.32%) and has the lowest average lack of health insurance (8.34%), suggesting better access to preventative care and healthcare services. In contrast, the South has the highest rate of uninsured individuals (15.07%) but relatively high checkup prevalence (76.92%), indicating that while many residents prioritize health checkups, systemic issues like lower income levels or gaps in healthcare expansion may limit insurance coverage. While cancer prevalence is similar across all the regions, the Midwest shows the highest average (8.28%), potentially linked to demographic factors such as an aging population or higher prevalence of cancer risk behaviors like smoking. The West Coast, with the lowest cancer prevalence (7.55%), might benefit from healthier lifestyles and policies supporting preventive care. These trends underline the influence of socioeconomic, behavioral, and policy-driven factors on regional health outcomes.</p>
-<p>The plots illustrate a negative association between housing insecurity and cancer prevalence, suggesting that individuals in higher housing-insecure areas may face barriers to healthcare and cancer diagnosis. Food insecurity, represented by the blue to yellow color gradient, is generally higher in areas with greater housing insecurity, exacerbating disparities. This trend suggests that individuals in areas with greater housing insecurity face barriers to accessing healthcare or diagnosis. These findings align with research showing that about 16.6% of cancer survivors had moderate to increased level of housing insecurity, which can further emphasize health inequities <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
-<p>The graph indicates a positive association between the lack of health insurance and housing insecurity, suggesting that individuals without health insurance are more likely to experience housing insecurity. This trend highlights the interconnectedness of socioeconomic factors that may indirectly contribute to cancer prevalence, as both housing insecurity and lack of health insurance are known barriers to accessing preventative care and timely cancer diagnoses <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. The widening spread of housing insecurity at higher levels of uninsured populations suggests regional or systemic disparities that could worsen health inequities.</p>
-<p>In this graph, a few previous correlations are reiterated. The box plots show a steady increase in prevalence of cancer as lack of health insurance decreases. As before, we interpret this as meaning that the variable representing prevalence of cancer in our data set would more accurately be described as representing prevalence of <em>detected</em> cancer, while, for people without health insurance, cancer is less likely to be discovered before it is too late. Likewise, prevalence of health checkups appears to be positively correlated with access to health insurance, and thus to prevalence of cancer.</p>
-<p>However, it would be easy to conclude from that information alone that there exists a causal relationship between lower income groups without health insurance, regular checkups, and cancer; this plot separates the individual points, which now represent counties, so that the variation in each health insurance category is clear. In fact, the scatter plot allows us to see that there are some outliers in the 8 - 11 and 11 - 15 percent groups with higher prevalences of cancer than the group with the most access to health insurance, illustrating that this is a complex issue, of which we are only observing two dimensions. We approach the question in this way because we would like to avoid deficit thinking.</p>
-<p>A map of lack of health insurance by contiguous U.S. county mostly highlights how extreme Southern and Eastern Texan counties are. Variation among other regions is more difficult to identify. Thus, we also provide a map with Texas removed.</p>
-<p>Now, it is evident that the Northeastern United States, as well as some counties on the West coast, have the highest access to health insurance. According to our previous plots, the other regions identified in these two maps likely have the greatest prevalence of undetected cancer instances. Keeping Texas in mind, there are a few potential factors that might be related to the geographical distribution we observe: migration, political leaning, and broad population density all exhibit trends that could be identified as similar to this one. On the other hand, without examining these variables alongside our data, county-by-county, it is impossible to say what factors are truly influential on this variation.</p>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This project highlights the significant regional disparities in health outcomes across the United States, focusing on cancer prevalence, healthcare access, and socioeconomic factors such as housing and food insecurity. Through the analysis of PLACES Census Tract Data, we observed varying relationships between health indicators, including a negative correlation between housing insecurity and cancer prevalence. These trends suggest that regions with higher levels of housing insecurity may face barriers to healthcare access, potentially leading to undetected cancer cases. Furthermore, a positive association between lack of health insurance and housing insecurity reinforces the interconnectedness of socioeconomic factors that contribute to health disparities.</p>
-<p>The geographic maps further illustrated the extreme lack of health insurance in areas like the Texas, where access to care is particularly limited. This reinforces the need for targeted policy interventions in regions with high uninsured populations, particularly in the South and West, where lack of health insurance is more prevalent. Still, the data shows a high level of variation alongside the strong trends that are present, so such policies would ideally be implemented on a granular level that meets the needs of specific communities.</p>
-<p>Ultimately, this project emphasizes the critical role of socioeconomic factors in shaping health outcomes, with access to healthcare services, housing, and food security directly influencing cancer prevalence and detection. Addressing these disparities requires comprehensive policy solutions that not only focus on healthcare access but also tackle underlying socioeconomic inequalities that disproportionately affect vulnerable populations <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</p>
 
 
 </section>
 
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>“Cancer Stat Facts: Common Cancer Sites.” National Cancer Institute , SEER, seer.cancer.gov/statfacts/html/common.html. Accessed 24 Nov.&nbsp;2024.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Coughlin, Steven&nbsp; S. “Housing Insecurity among Cancer Survivors: Results from the 2017 Behavioral Risk Factor Surveillance System Survey.” Journal of Cancer Policy, Elsevier, 31 Dec.&nbsp;2021, www.sciencedirect.com/science/article/pii/S2213538321000515?via%3Dihub<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>Abdelsattar, Zaid M, et al.&nbsp;“The Impact of Health Insurance on Cancer Care in Disadvantaged Communities.” NIH, U.S. National Library of Medicine, 1 Apr.&nbsp;2017, pmc.ncbi.nlm.nih.gov/articles/PMC5360496/#:~:text=Despite%20significant%20strides%20in%20overall,from%20receiving%20optimal%20cancer%20care.&amp;text=Individuals%20without%20health%20insurance%20lack,stage%20and%20have%20worse%20outcomes.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>Andrew Matthius, Emma Quinn. “Walking the Talk: Intervention Programs Aiming to Close the Cancer Care Gap.” American Association for Cancer Research (AACR), 6 Nov.&nbsp;2024, www.aacr.org/blog/2024/11/05/walking-the-talk-intervention-programs-aiming-to-close-the-cancer-care-gap/.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -602,4 +572,5 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

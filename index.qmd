@@ -17,9 +17,7 @@ about:
       href: thomsonzach268@gmail.com
 ---
 
-Hi! I am senior at St. Olaf College majoring in biology with a concentration in business & management studies.
-
-The primary goal of this website is to display the data science projects I have worked on over the last few years. The panel at the _______ and shares a little more about me. All of the code used to produce these projects, including this website, can be found on my GitHub linked below.
+Hi! I am a senior at St. Olaf College, majoring in Biology with a concentration in Business & Management Studies. My interests lie at the intersection of science, business, and law, including healthcare economics, health policy, and using data to improve patient outcomes. The primary goal of this website is to showcase the data science projects I have worked on this semester. All of the code used to produce these projects, including this website, is available on my GitHub linked below.
 
 ## Education 
 

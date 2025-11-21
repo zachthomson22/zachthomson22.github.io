@@ -8,11 +8,10 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - choropleth_maps.qmd
       - The_Guardian_Text_Analysis.qmd
-      - href: Visualizing_Cancer.qmd
-        text: Visualizing Cancer Prevalence
-      - about.qmd
+      - href: choropleth_maps.qmd
+        text: Hospital Spening Choropleth Maps
+      
         
 
 format:

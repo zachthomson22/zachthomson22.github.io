@@ -1,5 +1,244 @@
 ---
-title: "Choropleth Maps"
-format: html
+title: "Mapping US Hospital Spending (1991-2020)"
+format:
+  html: 
+    toc: true
+    smooth-scroll: true
+editor_options: 
+  chunk_output_type: console
 ---
 
+```{r, include=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(maps)
+library(sf)
+library(viridis)
+library(leaflet)
+library(janitor)
+```
+
+## Introduction
+Healthcare Spending in the United States has risen every year since the 1970s. In 2023, spending reached $4.9 trillion or $14,570 per person, this is approximately 17.6% of our Gross Domestic Product. Hospitals account for nearly one third (31.%) of total health spending. This spending varies across states in ways that reflect policy changes, demographic patterns, and economic conditions. This page uses choropleth maps to visualize the differences in hospital care spending and how it has changed over time. It also looks at Medicaid expansion and attempts to draw a connection between spending and the policy shift.
+
+## Hospital Care Spending 
+
+```{r, include=FALSE, message=FALSE, echo=FALSE}
+US_PER_CAPITA20 <- read_csv(file = "Choropleth Maps/US_PER_CAPITA20.csv")
+
+#determine min and max values for scale
+range_vals <- US_PER_CAPITA20 |>
+  filter(Item == "Hospital Care ($)", Group == "State") |>
+  summarise(
+    min_val = min(Y1991, Y2020, na.rm = TRUE),
+    max_val = max(Y1991, Y2020, na.rm = TRUE))
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "Figure 1. Per capita hospital care spending in 1991 across the United States."}
+#Filter and clean data for 1991 hospital spending
+cleaned_health_data2 <- US_PER_CAPITA20 |> 
+  select(Item, Group, State_Name, Y1991) |> 
+  filter(Item == "Hospital Care ($)", 
+         Group == "State")
+
+us_states <- map_data("state")
+
+#mutate all state names to lowercase
+cleaned_health_data2 <- cleaned_health_data2 |> 
+  mutate(State_Name = str_to_lower(State_Name))
+
+#Merge spending data with map data to create tidy dataset for plotting
+cleaned_health_data2 |> 
+  right_join(us_states, by = c("State_Name" = "region")) |>
+  ggplot(mapping = aes(x = long, y = lat,
+                          group = group)) + 
+  geom_polygon(aes(fill = Y1991), color = "black") +
+  labs(fill = "Hospital Care ($)",
+       title = "Per capita Hospital Care (1991)") +
+  coord_map() +
+  theme_void() +
+  scale_fill_viridis(limits = c(range_vals$min_val, range_vals$max_val),
+                     trans = "log",
+                     option = "D")
+```
+Hospital care represents the largest single category of health spending, and its distribution across the United States has changed over the past three decades. In 1991, per capita hospital spending was relatively uniform, with most states clustered in a narrow range. Using a logarithmic scale allows small differences to be visible, revealing slightly higher spending in states such as Illinois, Pennsylvania, and Massachusetts, and slightly lower spending in states including Utah, Idaho, and Washington (Figure 1). This pattern indicates that at the start of the 1990s, geographic differences in hospital costs were modest, suggesting limited variation in the underlying drivers of hospital expenditures at the state level.
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "Figure 2. Per capita hospital care spending in 2020 across the United States."}
+#Repeat similar steps for 2020 spending data
+cleaned_health_data <- US_PER_CAPITA20 |> 
+  select(Item, Group, State_Name, Y2020) |> 
+  filter(Item == "Hospital Care ($)", 
+         Group == "State")
+
+us_states <- map_data("state")
+
+cleaned_health_data <- cleaned_health_data |> 
+  mutate(State_Name = str_to_lower(State_Name))
+
+cleaned_health_data |> 
+  right_join(us_states, by = c("State_Name" = "region")) |>
+  ggplot(mapping = aes(x = long, y = lat,
+                          group = group)) + 
+  geom_polygon(aes(fill = Y2020), color = "black") +
+  labs(fill = "Hospital Care ($)",
+       title = "Per capita Hospital Care (2020)") +
+  coord_map() +
+  theme_void() +
+  scale_fill_viridis(limits = c(range_vals$min_val, range_vals$max_val),
+                     trans = "log",
+                     option = "D")
+```
+By 2020, spending had increased in every state and regional patterns became more pronounced. Higher spending persisted in the Northeast and parts of the West, while previously lower-spending states experienced faster growth, reducing some relative differences but accentuating the concentration of high costs in specific areas (Figure 2). Comparing 1991 and 2020 highlights both the growth in hospital spending and the emergence of distinct geographic clusters of higher and lower expenditure. This change suggests that state-specific factors, such as demographics, healthcare infrastructure, and policy interventions, increasingly influenced spending patterns over time.
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "Figure 3. Interactive map showing 2020 hospital spending and average annual percent growth by state."}
+library(sf)
+library(leaflet)
+library(htmltools)
+states_sf <- read_sf("https://rstudio.github.io/leaflet/json/us-states.geojson")
+
+#Filter and clean data for interactive map
+AAG_data <- US_PER_CAPITA20 |> 
+  select(Item, Group, State_Name, Y2020, Average_Annual_Percent_Growth) |> 
+  filter(Item == "Hospital Care ($)", 
+         Group == "State") |> 
+   mutate(State_Name = str_to_lower(State_Name))
+
+#Make sure names are lowercase before merging
+states_sf <- states_sf |> 
+  mutate(State_Name = str_to_lower(name))
+
+states_joined <- states_sf |> 
+  left_join(AAG_data, by = "State_Name")
+
+#Build HTML labels for hover pop-ups
+labels <- sprintf(
+  "<strong>%s</strong><br/>Y2020: $%s<br/>AAG: %s%%",
+  states_joined$name,
+  formatC(states_joined$Y2020, format = "f", digits = 0, big.mark = ","),
+  round(states_joined$Average_Annual_Percent_Growth, 2)
+) |> lapply(HTML)
+
+#Define color palette for interactive map
+pal <- colorNumeric(
+  palette = "viridis",
+  domain = states_joined$Y2020)
+
+#create interactive map using leaflet
+leaflet(states_joined) |>
+  setView(-96, 37.8, 4) |>
+  addTiles() |>
+  addPolygons(
+    fillColor = ~pal(Y2020),
+    weight = 1,
+    color = "white",
+    fillOpacity = 0.7,
+    highlightOptions = highlightOptions(
+      weight = 3,
+      color = "#666",
+      fillOpacity = 0.7,
+      bringToFront = TRUE),
+    label = labels,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "15px",
+      direction = "auto")) |> 
+  addLegend(pal = pal, values = na.omit(states_joined$Y2020), opacity = 0.7, title = NULL,
+    position = "bottomright")
+```
+The interactive map adds further context by incorporating the average annual growth rate (AAG) alongside 2020 spending (Figure 3). States with lower initial spending often exhibit higher growth rates, approaching national averages, while historically higher-spending states show moderate growth. This combination of final spending and growth rate allows identification of states that experienced the most dynamic changes over three decades. Observing these patterns helps frame subsequent analysis of how Medicaid expansion may have contributed to shifts in hospital expenditures, as states with rapid growth may overlap with expansion decisions or timing.
+
+## How has the expansion of Medicaid affected hospital spending?
+The Affordable Care Act’s Medicaid expansion, implemented in 2014, extended coverage to adults with incomes up to 138% of the Federal Poverty Level. This policy created substantial variation in state-level coverage and hospital demand.
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "Figure 4. States classified by Medicaid expansion decision."}
+library(readxl)
+
+medicaid_expansion <- read_xls("Choropleth Maps/medicaid_expansion.xls")
+
+#clean data
+cleaned_ME <- medicaid_expansion[-c(1, 53:75), ] |> 
+  mutate(Location = str_to_lower(Location)) |> 
+  rename(expansion_decision = `Status of Medicaid Expansion Decision`)
+
+# Merge with map data and plot
+cleaned_ME |> 
+  select(Location, expansion_decision) |>
+  left_join(us_states, by = c("Location" = "region")) |> 
+  ggplot(mapping = aes(x = long, y = lat,
+                          group = group)) + 
+  geom_polygon(aes(fill = expansion_decision), color = "black") +
+  labs(fill = "Expansion Decision", 
+       title = "State Action on the Medicaid Expansion Decision") +
+  coord_map() +
+  theme_void() +
+  scale_fill_manual(values = c("grey", "salmon1"))
+```
+The static map of expansion decisions illustrates which states adopted the policy and which did not (Figure 4). Expansion is concentrated in the West, Northeast, and parts of the Midwest, while non-expansion states are largely in the South and central regions. The clear regional divide suggests that political, economic, and demographic factors influenced adoption.
+```{r, warning=FALSE, message=FALSE, echo=FALSE, fig.cap= "Figure 5. Interactive map showing Medicaid expansion adoption by year for each state."}
+ME_dates <- read_csv("Choropleth Maps/raw_data (2).csv")
+
+clean_ME_dates <- ME_dates[-c(1:3, 55:77), ] |> 
+  rename(Location = `Title: Status of State Action on the Medicaid Expansion Decision | KFF State Health Facts`) |> 
+  mutate(
+    Location = str_to_lower(Location),
+    `...3` = na_if(`...3`, "NA"),
+    `...3` = na_if(`...3`, "")) |> 
+  select(Location, ...2, ...3)
+
+library(sf)
+states <- read_sf("https://rstudio.github.io/leaflet/json/us-states.geojson")
+
+library(htmltools)
+library(glue)
+
+states_clean <- states |> 
+  mutate(name = str_to_lower(name))
+
+states_joined <- states_clean |> 
+  left_join(clean_ME_dates, by = c("name" = "Location")) |> 
+  mutate(
+    # Create a clean status label
+    label_value = ifelse(
+      is.na(`...3`) | `...3` == "N/A", 
+      "Not adopted",               # For non-expansion states
+      paste0("Adopted: ", `...3`)),  # For adopted states, include date
+    # Build the hover label combining state name and status using HTML
+    labels2 = paste0("State: ", name, "<br>Status: ", label_value))
+
+pal <- colorFactor(
+  palette = c("grey", "salmon1"),
+  domain = na.omit(states_joined$`...2`))
+
+leaflet(states_joined) |>
+  setView(-96, 37.8, 4) |>
+  addTiles() |>
+  addPolygons(
+    fillColor = ~pal(`...2`),
+    weight = 1,
+    color = "white",
+    fillOpacity = 0.7,
+    highlightOptions = highlightOptions(
+      weight = 3,
+      color = "#666",
+      fillOpacity = 0.7,
+      bringToFront = TRUE
+    ),
+    label = ~lapply(labels2, HTML),
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "15px",
+      direction = "auto")) |> 
+  addLegend(pal = pal, values = na.omit(states_joined$`...2`), opacity = 0.7, title = NULL,
+    position = "bottomright")
+```
+The interactive map shows the timing of Medicaid expansion adoption for each state (Figure 5). Early adoption occurred primarily in the West and Northeast, whereas later adoption is scattered across other regions. Combining this temporal information with hospital spending growth reveals patterns suggesting that earlier expansion may have contributed to higher growth in hospital costs, as coverage expansion increases utilization and shifts the mix of care paid by hospitals and insurers. States that delayed or declined expansion tend to exhibit lower growth trajectories, indicating that policy timing influenced expenditure dynamics alongside other economic and demographic factors.
+
+Overall, the maps suggest that Medicaid expansion contributed to variation in hospital spending across states, both in level and growth. Early-adopting states appear to show stronger increases in per capita hospital expenditures, while non-expansion states maintain relatively lower spending. This highlights the interplay between policy decisions and healthcare spending trends, demonstrating how federal and state policies interact with preexisting patterns to shape cost growth.
+
+## Conclusion
+Hospital care spending has increased consistently across all U.S. states over the past three decades, with growth rates and absolute spending diverging regionally over time. The combination of static and interactive visualizations illustrates how baseline spending, growth trajectories, and policy choices such as Medicaid expansion interact to influence per capita hospital costs. Early adoption of Medicaid expansion aligns with faster spending growth in several states, while states that delayed or declined expansion show slower increases. Together, these patterns demonstrate how state-level policy decisions contribute to the evolving geographic distribution of healthcare expenditures.
+
+## Data Sources
+[CMS: Health Expenditures by State of Residence, 1991-2020](https://www.cms.gov/data-research/statistics-trends-and-reports/national-health-expenditure-data/state-residence)
+
+Average Annual Growth Rate = (growth in final year of analysis/growth in first year of analysis)^(1/(number of years))-1*100%
+
+[KFF: Status of State Action on the Medicaid Expansion Decision](https://www.kff.org/affordable-care-act/state-indicator/state-activity-around-expanding-medicaid-under-the-affordable-care-act/?currentTimeframe=0&selectedDistributions=status-of-medicaid-expansion-decision&sortModel=%7B%22colId%22:%22Location%22,%22sort%22:%22asc%22%7D)
+
+[CMS: National Health Expenditure Data](https://www.cms.gov/data-research/statistics-trends-and-reports/national-health-expenditure-data/historical#:~:text=The%20National%20Health%20Expenditure%20Accounts,CY%201960%2D2023%20(ZIP))

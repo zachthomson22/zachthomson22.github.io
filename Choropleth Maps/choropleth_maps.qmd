@@ -1,0 +1,9 @@
+---
+title: "Choropleth Maps"
+format:
+  html: 
+    toc: true
+    smooth-scroll: true
+---
+
+## Introduction
